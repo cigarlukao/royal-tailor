@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>皇家裁縫手札 · 帝國夕照個人與家庭量身檔案</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#c59a3f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="皇家裁縫手札">
+  <link rel="apple-touch-icon" href="icon-512.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Noto+Serif+TC:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sunset-deep: #160805;
+      --parchment: #f7eedc;
+      --parchment-mid: #ede0c6;
+      --parchment-border: #cbb48b;
+      --brass-gold: #c59a3f;
+      --brass-dark: #6e4b16;
+      --royal-red: #7c1a1a;
+      --royal-red-light: #9e2424;
+      --ink: #211915;
+      --ink-muted: #64554b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      background: radial-gradient(circle at 50% 12%, #4a2114 0%, #200b06 55%, #0c0402 100%);
+      color: var(--ink);
+      font-family: 'Noto Serif TC', 'Georgia', serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 24px 14px 60px;
+    }
+    .dossier-wrap {
+      width: 100%;
+      max-width: 1120px;
+      background: var(--parchment);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(197, 154, 63, 0.5);
+      border-radius: 6px;
+      position: relative;
+      padding: 38px 32px;
+      border: 2px solid var(--brass-gold);
+    }
+    .dossier-wrap::before {
+      content: "";
+      position: absolute;
+      top: 8px; left: 8px; right: 8px; bottom: 8px;
+      border: 1px solid var(--brass-gold);
+      pointer-events: none;
+      opacity: 0.65;
+    }
+    header { text-align: center; border-bottom: 2px double var(--brass-gold); padding-bottom: 22px; }
+    .crest { font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: 6px; color: var(--brass-dark); text-transform: uppercase; margin-bottom: 6px; }
+    h1 { font-family: 'Cinzel', 'Noto Serif TC', serif; font-size: 28px; font-weight: 700; color: var(--royal-red); letter-spacing: 3px; margin-bottom: 8px; }
+    .sub-title { font-size: 13px; color: var(--ink-muted); letter-spacing: 1.5px; }
+    .members-bar { display: flex; align-items: center; gap: 10px; overflow-x: auto; padding: 20px 0 14px; border-bottom: 1px solid var(--parchment-border); }
+    .member-tab { background: var(--parchment-mid); border: 1px solid var(--parchment-border); padding: 8px 20px; border-radius: 3px; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; font-family: inherit; }
+    .member-tab.active { background: var(--royal-red); color: #fff; border-color: var(--royal-red-light); }
+    .btn-add-member { background: transparent; border: 1px dashed var(--brass-gold); padding: 8px 16px; border-radius: 3px; font-size: 13px; color: var(--brass-dark); cursor: pointer; white-space: nowrap; font-family: inherit; }
+    .controls-strip { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 16px 0 22px; }
+    .unit-switch { display: flex; background: var(--parchment-mid); border: 1px solid var(--brass-gold); border-radius: 4px; overflow: hidden; }
+    .unit-btn { padding: 6px 14px; font-size: 13px; background: transparent; border: none; font-family: inherit; cursor: pointer; }
+    .unit-btn.active { background: var(--brass-gold); color: #fff; font-weight: 700; }
+    .action-links { display: flex; gap: 10px; font-size: 13px; }
+    .action-btn { background: none; border: 1px solid var(--parchment-border); padding: 5px 12px; border-radius: 3px; cursor: pointer; color: var(--ink-muted); font-family: inherit; }
+    .main-workspace { display: grid; grid-template-columns: 280px 1fr 240px; gap: 22px; align-items: start; }
+    @media (max-width: 1060px) { .main-workspace { grid-template-columns: 1fr; } }
+    .mannequin-panel { background: rgba(255, 255, 255, 0.45); border: 1px solid var(--parchment-border); border-radius: 4px; padding: 16px; text-align: center; }
+    .panel-header { font-family: 'Cinzel', serif; font-size: 14px; font-weight: 700; color: var(--brass-dark); border-bottom: 1px solid var(--parchment-border); padding-bottom: 8px; margin-bottom: 12px; }
+    .mannequin-svg { width: 100%; max-width: 230px; height: auto; margin: 0 auto; display: block; }
+    .mannequin-hint { font-size: 12px; color: var(--ink-muted); margin-top: 10px; }
+    .mannequin-node { cursor: pointer; }
+    .measure-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+    .measure-card { background: rgba(255, 255, 255, 0.6); border: 1px solid var(--parchment-border); border-radius: 4px; padding: 16px 14px; }
+    .card-title { font-size: 14px; font-weight: 700; color: var(--brass-dark); border-bottom: 1px solid var(--parchment-border); padding-bottom: 6px; margin-bottom: 12px; display: flex; justify-content: space-between; }
+    .field-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 9px; }
+    .field-row label { font-size: 13px; }
+    .field-input-box { display: flex; align-items: center; gap: 4px; }
+    .field-input-box input { width: 76px; padding: 4px 6px; font-size: 14px; text-align: right; border: 1px solid var(--parchment-border); border-radius: 3px; font-family: 'Cinzel', serif; }
+    .field-input-box input:focus, .field-input-box input.highlighted { outline: none; border-color: var(--royal-red); background: #fffdf7; }
+    .unit-tag { font-size: 11px; color: var(--ink-muted); width: 26px; }
+    .side-tools-panel { display: flex; flex-direction: column; gap: 16px; }
+    .shoe-matrix-card { background: rgba(255, 255, 255, 0.5); border: 1px solid var(--parchment-border); border-radius: 4px; padding: 14px; }
+    .shoe-table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: center; margin-top: 8px; }
+    .shoe-table th, .shoe-table td { padding: 5px 2px; border: 1px solid var(--parchment-border); }
+    .shoe-table th { background: var(--parchment-mid); color: var(--brass-dark); font-weight: 700; }
+    .shoe-table tr:hover td { background: rgba(197, 154, 63, 0.2); cursor: pointer; }
+    .notes-box { margin-top: 20px; background: rgba(255, 255, 255, 0.55); border: 1px solid var(--parchment-border); padding: 14px; border-radius: 4px; }
+    .notes-box label { display: block; font-size: 13px; font-weight: 700; color: var(--brass-dark); margin-bottom: 6px; }
+    .notes-box textarea { width: 100%; height: 70px; border: 1px solid var(--parchment-border); border-radius: 3px; padding: 8px; font-family: inherit; font-size: 13px; }
+    .wax-seal { position: absolute; bottom: 24px; right: 28px; width: 60px; height: 60px; background: radial-gradient(circle, var(--royal-red-light) 0%, var(--royal-red) 70%, #3e0b0b 100%); border-radius: 50%; box-shadow: 2px 4px 10px rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; color: #dfb75c; font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; text-align: center; line-height: 1.1; border: 2px dashed rgba(223, 183, 92, 0.65); transform: rotate(-10deg); pointer-events: none; }
+  </style>
+</head>
+<body>
+  <div class="dossier-wrap">
+    <header>
+      <div class="crest">SAVILE ROW BESPOKE ARCHIVE</div>
+      <h1>皇家裁縫手札 · 個人與家族量身案卷</h1>
+      <div class="sub-title">1897 薩維爾街大英帝國訂製規制 · 終身立裁檔案</div>
+    </header>
+
+    <div class="members-bar" id="membersBar">
+      <button class="btn-add-member" onclick="addNewMember()">+ 冊封新成員</button>
+    </div>
+
+    <div class="controls-strip">
+      <div class="unit-switch">
+        <button class="unit-btn active" id="btn-cm" onclick="setUnit('cm')">公分 (cm)</button>
+        <button class="unit-btn" id="btn-inch" onclick="setUnit('inch')">英吋 (in)</button>
+        <button class="unit-btn" id="btn-cun" onclick="setUnit('cun')">台寸</button>
+      </div>
+      <div class="action-links">
+        <button class="action-btn" onclick="window.print()">謄本列印 / 存為PDF</button>
+        <button class="action-btn" onclick="exportData()">導出備份 (JSON)</button>
+        <button class="action-btn" onclick="document.getElementById('importFile').click()">匯入檔案</button>
+        <input type="file" id="importFile" style="display:none" onchange="importData(event)">
+      </div>
+    </div>
+
+    <div class="main-workspace">
+      <!-- 左欄：立裁人體骨相圖解 -->
+      <div class="mannequin-panel">
+        <div class="panel-header">ANATOMICAL REFERENCE</div>
+        <svg class="mannequin-svg" viewBox="0 0 200 420" xmlns="http://www.w3.org/2000/svg">
+          <line x1="100" y1="20" x2="100" y2="400" stroke="#cbb48b" stroke-width="1" stroke-dasharray="3,3"/>
+          <g fill="none" stroke="#6e4b16" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <ellipse cx="100" cy="45" rx="18" ry="22"/>
+            <path d="M94 67 L94 82 M106 67 L106 82"/>
+            <path d="M62 96 C74 86 90 84 100 84 C110 84 126 86 138 96"/>
+            <path d="M62 96 L68 180 L60 225 L75 375 L86 385 L96 240"/>
+            <path d="M138 96 L132 180 L140 225 L125 375 L114 385 L104 240"/>
+            <path d="M96 240 L104 240"/>
+            <path d="M62 96 L45 175 L38 235"/>
+            <path d="M138 96 L155 175 L162 235"/>
+          </g>
+          <g class="mannequin-node" onclick="focusField('m_head')"><circle cx="100" cy="45" r="4.5" fill="#c59a3f" stroke="#211915" stroke-width="1"/><text x="126" y="48" font-size="9" fill="#7c1a1a">頭圍</text></g>
+          <g class="mannequin-node" onclick="focusField('m_shoulder')"><circle cx="62" cy="96" r="4.5" fill="#c59a3f" stroke="#211915" stroke-width="1"/><text x="26" y="99" font-size="9" fill="#7c1a1a">肩寬</text></g>
+          <g class="mannequin-node" onclick="focusField('m_chest')"><circle cx="100" cy="120" r="4.5" fill="#c59a3f" stroke="#211915" stroke-width="1"/><text x="108" y="123" font-size="9" fill="#7c1a1a">胸圍</text></g>
+          <g class="mannequin-node" onclick="focusField('m_sleeve')"><circle cx="45" cy="175" r="4.5" fill="#c59a3f" stroke="#211915" stroke-width="1"/><text x="14" y="178" font-size="9" fill="#7c1a1a">袖長</text></g>
+          <g class="mannequin-node" onclick="focusField('m_waist')"><circle cx="100" cy="180" r="4.5" fill="#c59a3f" stroke="#211915" stroke-width="1"/><text x="108" y="183" font-size="9" fill="#7c1a1a">腰圍</text></g>
+          <g class="mannequin-node" onclick="focusField('m_hip')"><circle cx="100" cy="220" r="4.5" fill="#c59a3f" stroke="#211915" stroke-width="1"/><text x="108" y="223" font-size="9" fill="#7c1a1a">臀圍</text></g>
+          <g class="mannequin-node" onclick="focusField('m_inseam')"><circle cx="100" cy="280" r="4.5" fill="#c59a3f" stroke="#211915" stroke-width="1"/><text x="108" y="283" font-size="9" fill="#7c1a1a">跨下長</text></g>
+          <g class="mannequin-node" onclick="focusField('m_foot_len')"><circle cx="86" cy="385" r="4.5" fill="#c59a3f" stroke="#211915" stroke-width="1"/><text x="50" y="395" font-size="9" fill="#7c1a1a">腳長</text></g>
+        </svg>
+        <div class="mannequin-hint">✦ 點擊圖上標註點，可直接跳轉至輸入框</div>
+      </div>
+
+      <!-- 中欄：量身資料 -->
+      <div>
+        <div class="measure-grid">
+          <div class="measure-card">
+            <div class="card-title"><span>上軀與領肩</span> <span>Ⅰ</span></div>
+            <div class="field-row"><label>頭圍 (Head)</label><div class="field-input-box"><input type="number" step="0.1" id="m_head" oninput="saveCurrentData()"><span class="unit-tag">cm</span></div></div>
+            <div class="field-row"><label>領口頸圍 (Neck)</label><div class="field-input-box"><input type="number" step="0.1" id="m_neck" oninput="saveCurrentData()"><span class="unit-tag">cm</span></div></div>
+            <div class="field-row"><label>肩寬 (Shoulder)</label><div class="field-input-box"><input type="number" step="0.1" id="m_shoulder" oninput="saveCurrentData()"><span class="unit-tag">cm</span></div></div>
+            <div class="field-row"><label>胸圍 (Chest/Bust)</label><div class="field-input-box"><input type="number" step="0.1" id="m_chest" oninput="saveCurrentData()"><span class="unit-tag">cm</span></div></div>
+          </div>
+          <div class="measure-card">
+            <div class="card-title"><span>臂長與身軀</span> <span>Ⅱ</span></div>
+            <div class="field-row"><label>袖長 (Sleeve)</label><div class="field-input-box"><input type="number" step="0.1" id="m_sleeve" oninput="saveCurrentData()"><span class="unit-tag">cm</span></div></div>
+            <div class="field-row"><label>上臂圍 (Bicep)</label><div class="field-input-box"><input type="number" step="0.1" id="m_bicep" oninput="saveCurrentData()"><span class="unit-tag">cm</span></div></div>
+            <div class="field-row"><label>手腕圍 (Wrist)</label><div class="field-input-box"><input type="number" step="0.1" id="m_wrist" oninput="saveCurrentData()"><span class="unit-tag">cm</span></div></div>
+            <div class="field-row"><label>後背長 (Back L)</label><div class="field-input-box"><input type="number" step="0.1" id="m_back" oninput="saveCurrentData()"><span class="unit-tag">cm</span></div></div>
+          </div>
+          <div class="measure-card">
+            <div class="card-title"><span>腰腹與跨腿</span> <span>Ⅲ</span></div>
+            <div class="field-row"><label>高腰/自然腰 (Waist)</label><div class="field-input-box"><input type="number" step="0.1" id="m_waist" oninput="saveCurrentData()"><span class="unit-tag">cm</span></div></div>
+            <div class="field-row"><label>臀圍 (Hips)</label><div class="field-input-box"><input type="number" step="0.1" id="m_hip" oninput="saveCurrentData()"><span class="unit-tag">cm</span></div></div>
+            <div class="field-row"><label>跨下內長 (Inseam)</label><div class="field-input-box"><input type="number" step="0.1" id="m_inseam" oninput="saveCurrentData()"><span class="unit-tag">cm</span></div></div>
+            <div class="field-row"><label>外側褲長 (Outseam)</label><div class="field-input-box"><input type="number" step="0.1" id="m_outseam" oninput="saveCurrentData()"><span class="unit-tag">cm</span></div></div>
+            <div class="field-row"><label>大腿圍 (Thigh)</label><div class="field-input-box"><input type="number" step="0.1" id="m_thigh" oninput="saveCurrentData()"><span class="unit-tag">cm</span></div></div>
+          </div>
+          <div class="measure-card">
+            <div class="card-title"><span>足履規章</span> <span>Ⅳ</span></div>
+            <div class="field-row"><label>淨腳長 (Foot L)</label><div class="field-input-box"><input type="number" step="0.1" id="m_foot_len" oninput="saveCurrentData()"><span class="unit-tag">cm</span></div></div>
+            <div class="field-row"><label>腳掌寬 (Foot W)</label><div class="field-input-box"><input type="number" step="0.1" id="m_foot_wid" oninput="saveCurrentData()"><span class="unit-tag">cm</span></div></div>
+            <div class="field-row"><label>英碼 (UK Shoe)</label><div class="field-input-box"><input type="text" id="m_shoe_uk" oninput="saveCurrentData()" style="text-align: center;"><span class="unit-tag">UK</span></div></div>
+            <div class="field-row"><label>歐碼 (EU Shoe)</label><div class="field-input-box"><input type="text" id="m_shoe_eu" oninput="saveCurrentData()" style="text-align: center;"><span class="unit-tag">EU</span></div></div>
+          </div>
+        </div>
+        <div class="notes-box">
+          <label>✦ 宮廷立裁體態備註 (Bespoke Fitting Notes)</label>
+          <textarea id="m_notes" placeholder="例如：右肩微落 0.5 公分、習慣穿著高腰附調整帶長褲..." oninput="saveCurrentData()"></textarea>
+        </div>
+      </div>
+
+      <!-- 右欄：鞋碼速查 -->
+      <div class="side-tools-panel">
+        <div class="shoe-matrix-card">
+          <div class="card-title"><span>皇家鞋靴對照</span> <span>⚜</span></div>
+          <table class="shoe-table">
+            <thead><tr><th>CM</th><th>UK</th><th>EU</th><th>US</th></tr></thead>
+            <tbody>
+              <tr onclick="applyShoe('25.5', '7.0', '41')"><td>25.5</td><td>7.0</td><td>41</td><td>8.0</td></tr>
+              <tr onclick="applyShoe('26.0', '7.5', '41.5')"><td>26.0</td><td>7.5</td><td>41.5</td><td>8.5</td></tr>
+              <tr onclick="applyShoe('26.5', '8.0', '42')"><td>26.5</td><td>8.0</td><td>42</td><td>9.0</td></tr>
+              <tr onclick="applyShoe('27.0', '8.5', '43')"><td>27.0</td><td>8.5</td><td>43</td><td>9.5</td></tr>
+              <tr onclick="applyShoe('27.5', '9.0', '43.5')"><td>27.5</td><td>9.0</td><td>43.5</td><td>10.0</td></tr>
+              <tr onclick="applyShoe('28.0', '9.5', '44')"><td>28.0</td><td>9.5</td><td>44</td><td>10.5</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="wax-seal">VR<br>1897</div>
+  </div>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+
+    const defaultData = {
+      currentUnit: 'cm',
+      activeMemberId: 'mem_1',
+      members: [
+        {
+          id: 'mem_1',
+          name: '家長（父親）',
+          notes: '右肩略低 0.5 公分，習慣穿著維多利亞立領寬鬆西裝。',
+          values: {
+            m_head: 58, m_neck: 41, m_shoulder: 46, m_chest: 102,
+            m_sleeve: 63, m_bicep: 34, m_wrist: 18, m_back: 48,
+            m_waist: 88, m_hip: 100, m_inseam: 78, m_outseam: 104, m_thigh: 58,
+            m_foot_len: 26.5, m_foot_wid: 10, m_shoe_uk: '8.5', m_shoe_eu: '42.5'
+          }
+        },
+        {
+          id: 'mem_2',
+          name: '長子',
+          notes: '骨架修長挺拔，偏好修身雙排扣禮服。',
+          values: {
+            m_head: 56.5, m_neck: 38, m_shoulder: 44, m_chest: 94,
+            m_sleeve: 61, m_bicep: 30, m_wrist: 16.5, m_back: 46,
+            m_waist: 76, m_hip: 92, m_inseam: 80, m_outseam: 106, m_thigh: 52,
+            m_foot_len: 27, m_foot_wid: 9.8, m_shoe_uk: '9', m_shoe_eu: '43'
+          }
+        }
+      ]
+    };
+
+    let appState = JSON.parse(localStorage.getItem('royal_tailor_state')) || defaultData;
+
+    const CONVERSIONS = {
+      cm: { toCm: val => val, fromCm: val => val },
+      inch: { toCm: val => val * 2.54, fromCm: val => val / 2.54 },
+      cun: { toCm: val => val * 3.0303, fromCm: val => val / 3.0303 }
+    };
+
+    const numericFields = [
+      'm_head', 'm_neck', 'm_shoulder', 'm_chest', 
+      'm_sleeve', 'm_bicep', 'm_wrist', 'm_back', 
+      'm_waist', 'm_hip', 'm_inseam', 'm_outseam', 'm_thigh',
+      'm_foot_len', 'm_foot_wid'
+    ];
+
+    function init() {
+      renderMembersBar();
+      updateUnitButtons();
+      loadActiveMemberValues();
+    }
+
+    function renderMembersBar() {
+      const bar = document.getElementById('membersBar');
+      bar.innerHTML = '';
+      appState.members.forEach(member => {
+        const btn = document.createElement('button');
+        btn.className = `member-tab ${member.id === appState.activeMemberId ? 'active' : ''}`;
+        btn.textContent = member.name;
+        btn.onclick = () => switchMember(member.id);
+        bar.appendChild(btn);
+      });
+      const addBtn = document.createElement('button');
+      addBtn.className = 'btn-add-member';
+      addBtn.textContent = '+ 冊封新成員';
+      addBtn.onclick = addNewMember;
+      bar.appendChild(addBtn);
+    }
+
+    function switchMember(id) {
+      appState.activeMemberId = id;
+      renderMembersBar();
+      loadActiveMemberValues();
+      saveToStorage();
+    }
+
+    function addNewMember() {
+      const name = prompt('請輸入新家庭成員稱謂：');
+      if (!name) return;
+      const newId = 'mem_' + Date.now();
+      appState.members.push({ id: newId, name: name, notes: '', values: {} });
+      switchMember(newId);
+    }
+
+    function getCurrentMember() {
+      return appState.members.find(m => m.id === appState.activeMemberId) || appState.members[0];
+    }
+
+    function loadActiveMemberValues() {
+      const member = getCurrentMember();
+      const currentUnit = appState.currentUnit;
+      numericFields.forEach(fieldId => {
+        const input = document.getElementById(fieldId);
+        const cmVal = member.values[fieldId];
+        if (cmVal !== undefined && cmVal !== null && cmVal !== '') {
+          const converted = CONVERSIONS[currentUnit].fromCm(parseFloat(cmVal));
+          input.value = Math.round(converted * 10) / 10;
+        } else {
+          input.value = '';
+        }
+      });
+      document.getElementById('m_shoe_uk').value = member.values['m_shoe_uk'] || '';
+      document.getElementById('m_shoe_eu').value = member.values['m_shoe_eu'] || '';
+      document.getElementById('m_notes').value = member.notes || '';
+      document.querySelectorAll('.unit-tag').forEach(tag => {
+        if (tag.textContent !== 'UK' && tag.textContent !== 'EU') tag.textContent = currentUnit;
+      });
+    }
+
+    function saveCurrentData() {
+      const member = getCurrentMember();
+      const currentUnit = appState.currentUnit;
+      numericFields.forEach(fieldId => {
+        const val = document.getElementById(fieldId).value;
+        if (val !== '') {
+          const cmVal = CONVERSIONS[currentUnit].toCm(parseFloat(val));
+          member.values[fieldId] = Math.round(cmVal * 10) / 10;
+        } else {
+          delete member.values[fieldId];
+        }
+      });
+      member.values['m_shoe_uk'] = document.getElementById('m_shoe_uk').value;
+      member.values['m_shoe_eu'] = document.getElementById('m_shoe_eu').value;
+      member.notes = document.getElementById('m_notes').value;
+      saveToStorage();
+    }
+
+    function setUnit(unit) {
+      if (appState.currentUnit === unit) return;
+      appState.currentUnit = unit;
+      updateUnitButtons();
+      loadActiveMemberValues();
+      saveToStorage();
+    }
+
+    function updateUnitButtons() {
+      ['cm', 'inch', 'cun'].forEach(u => {
+        document.getElementById(`btn-${u}`).classList.toggle('active', appState.currentUnit === u);
+      });
+    }
+
+    function focusField(fieldId) {
+      const el = document.getElementById(fieldId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.focus();
+        el.classList.add('highlighted');
+        setTimeout(() => el.classList.remove('highlighted'), 1500);
+      }
+    }
+
+    function applyShoe(cm, uk, eu) {
+      const currentUnit = appState.currentUnit;
+      const convCm = CONVERSIONS[currentUnit].fromCm(parseFloat(cm));
+      document.getElementById('m_foot_len').value = Math.round(convCm * 10) / 10;
+      document.getElementById('m_shoe_uk').value = uk;
+      document.getElementById('m_shoe_eu').value = eu;
+      saveCurrentData();
+    }
+
+    function saveToStorage() {
+      localStorage.setItem('royal_tailor_state', JSON.stringify(appState));
+    }
+
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `皇家裁縫家庭檔案_${new Date().toISOString().slice(0, 10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          appState = JSON.parse(e.target.result);
+          saveToStorage();
+          init();
+          alert('家庭手札尺寸已成功載入！');
+        } catch (err) {
+          alert('檔案格式不合，請確認是否為手札 JSON 檔案。');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>
