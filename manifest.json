@@ -1,0 +1,18 @@
+{
+  "name": "皇家裁縫。衣縷情絲",
+  "short_name": "皇家裁縫",
+  "description": "典藏家族從頭至足之骨相與尺規，跨國制式度量，歷經百年風華無懼流轉。",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#26120b",
+  "theme_color": "#b88b32",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
